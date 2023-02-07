@@ -86,14 +86,21 @@ app.get('/', (req, res) => {
 
 
 app.get('/autors', (req, res) => {
-  database.get('SELECT * FROM autors', (error, autori) => {
+    // database.get atgriež tikai vienu pirmo atrasto rezutlātu
+      // database.all atgriež visus atrastos rezultātus
+  database.all('SELECT * FROM autors', (error, autori) => {
     res.json(autori)
   })
 })
 
 app.post('/autors', (req, res) => {
+  database.run(`
+    INSERT INTO autors (name)
+    VALUES("${req.body.name}");
+  `, () => {
+    res.json('Jauns autors pievienots veiksmīgi')
+  })
 
-  res.json('POST pieprasījums veiksmīgs')
 })
 
 
