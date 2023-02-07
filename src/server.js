@@ -6,17 +6,20 @@ const sqlite3 = require('sqlite3').verbose();
 // pieslēdzamies mūsu DB
 const database = new sqlite3.Database("./src/db/database.db");
 
+// inicializējam express appu
 const app = express()
-const port = 3004
 
 // ļaujam piekļūt serverim no citiem domēniem
 app.use(cors({
   origin: '*'
 }))
 
+// ļaujam no FE sūtīt jsonu
 app.use(bodyParser.json());
 
+// uz servera palaišanu
 database.serialize(() => {
+  // izveidojam autors tabulu ja tāda neeksistē
   database.run(`
     CREATE TABLE IF NOT EXISTS autors (
       id INTEGER PRIMARY KEY,
@@ -24,6 +27,7 @@ database.serialize(() => {
     );
   `);
 
+  // izveidojam gleznas tabulu ja tāda neeksistē
   database.run(`
     CREATE TABLE IF NOT EXISTS gleznas (
       id INTEGER PRIMARY KEY,
@@ -35,16 +39,18 @@ database.serialize(() => {
   `);
 
 
-  // gribam jau pašā sākumā kad izveidojam datubāzes, iesetot pirmos datus
-  database.get('SELECT * from autors', (err, data) => {
-    // ja dati jau eksistē tad mēs negribam to darīt atkārtoti
-    if (!data) {
-
+  // gribam jau pašā sākumā kad izveidojam datubāzes, iesetot pirmos datus, 
+  // tāpēc paprasa datus no autors tabulas lai pārliecinātos vai tabula ir tukša vai nav
+  // dati būs pieejami funkcijas argumentā autors
+  database.get('SELECT * from autors', (err, autors) => {
+    // ja autoru nav, tad zinām ka datu vēl datubāzē nav vispār
+    if (!autors) {
+      // ieliekam iekšā pirmo autoru
       database.run(`
         INSERT INTO autors (name)
         VALUES('Leonardo da Vinci');
     `, () => {
-       
+      // kad autors ir ielikt, ieliekam iekšā pirmo gleznu
       database.run(`
         INSERT INTO gleznas (name, imgSrc, author_id)
         VALUES(
@@ -64,17 +70,22 @@ database.serialize(() => {
 // jeb šajā gadījumā http://localhost:3004/
 app.get('/', (req, res) => {
 
+  // izvēlamies visuu datus no autors tabulas
   database.get(`SELECT * FROM autors`, (err, movies) => {
-
+    // kad dati ir atnākuši no autors tabulas tad prasam datus no gleznas tabulas
     database.get(`SELECT * FROM gleznas`,(err, gleznas) => {
-      res.json({movies: movies, gleznas: gleznas})
+      // sūtam prom datus uz frontendu
+      res.json({
+        movies: movies, 
+        gleznas: gleznas
+      })
     })
 
   })
 })
 
-
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+// palaižam serveri ar 3004 portu
+app.listen(3004, () => {
+  console.log(`Example app listening on port 3004`)
 })
 
