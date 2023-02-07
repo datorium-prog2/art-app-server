@@ -84,6 +84,26 @@ app.get('/', (req, res) => {
   })
 })
 
+
+app.get('/autors', (req, res) => {
+  database.get('SELECT * FROM autors', (error, autori) => {
+    res.json(autori)
+  })
+})
+
+app.post('/autors', (req, res) => {
+
+  res.json('POST pieprasījums veiksmīgs')
+})
+
+
+// GET http://localhost:3004/autors
+// Atgriež visus autorus no DB
+
+// POST http://localhost:3004/autors
+// pievieno jaunu autoru
+
+
 // palaižam serveri ar 3004 portu
 app.listen(3004, () => {
   console.log(`Example app listening on port 3004`)
