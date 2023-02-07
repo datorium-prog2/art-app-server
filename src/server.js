@@ -84,7 +84,8 @@ app.get('/', (req, res) => {
   })
 })
 
-
+// GET http://localhost:3004/autors
+// Atgriež visus autorus no DB
 app.get('/autors', (req, res) => {
     // database.get atgriež tikai vienu pirmo atrasto rezutlātu
       // database.all atgriež visus atrastos rezultātus
@@ -93,6 +94,8 @@ app.get('/autors', (req, res) => {
   })
 })
 
+// POST http://localhost:3004/autors
+// pievieno jaunu autoru
 app.post('/autors', (req, res) => {
   database.run(`
     INSERT INTO autors (name)
@@ -102,13 +105,6 @@ app.post('/autors', (req, res) => {
   })
 
 })
-
-
-// GET http://localhost:3004/autors
-// Atgriež visus autorus no DB
-
-// POST http://localhost:3004/autors
-// pievieno jaunu autoru
 
 
 // palaižam serveri ar 3004 portu
